@@ -7,4 +7,4 @@ LICENSE
 pyvenv.cfg
 share
 .idea
-
+tests

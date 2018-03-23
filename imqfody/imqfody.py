@@ -21,11 +21,12 @@ class UnexpectedParameter(FodyError):
 
 
 class IMQFody(object):
-    def __init__(self, url, username, password):
+    def __init__(self, url, username, password, sslverify=True):
         object.__init__(self)
         self._url = url.rstrip('/')
         self._session = requests.session()
         self._session.auth = HTTPBasicAuth(username, password)
+        self._session.verify = sslverify
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._session.close()
@@ -63,6 +64,7 @@ class IMQFody(object):
         """Querying the base url returns the documentation"""
         return json.loads(self._session.get(self._url))
 
+    # #################
     # ContactDB queries
     def ping(self):
         """
@@ -144,6 +146,8 @@ class IMQFody(object):
         result = self._search('contactdb', 'searchnational', {'countrycode', cc})
         return self._get_contacts_from_id_list(result)
 
+    # #############
+    # Event queries
     def get_event(self, id):
         """
         Retrieve event by id
@@ -151,4 +155,25 @@ class IMQFody(object):
         :param id: event id int
         :return: dict
         """
-        return self._session.get('{}/api/event'.format(self._url), data={'id': id})
+        response = self._session.get('{}/api/events'.format(self._url), data={'id': id})
+        if response.status_code == 200:
+            return json.loads(response.text)
+        raise HTTPError('Statuscode: {}'.format(response.status_code))
+
+    def get_event_subqueries(self):
+        """
+        Return dictionary of event subqueries
+
+        :return: dict
+        """
+        return self._search('events', 'subqueries', {})
+
+    def search_event(self, subquery):
+        """
+        Search for events by a subquery.
+
+        :param subquery: dict subquery
+        :return: dict
+        """
+        return self._search('events', 'search', subquery)
+
