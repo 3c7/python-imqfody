@@ -1,0 +1,10 @@
+bin
+imqfody.egg-info
+include
+lib
+lib64
+LICENSE
+pyvenv.cfg
+share
+.idea
+
