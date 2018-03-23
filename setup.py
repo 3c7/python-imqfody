@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='imqfody',
-    version='0.0.2',
+    version='0.0.3',
     description='Python module for querying intelmq fody backend.',
     long_description=open('README.md').read(),
     author='Nils Kuhnert',

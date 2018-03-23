@@ -16,6 +16,10 @@ class HTTPError(FodyError):
     pass
 
 
+class UnexpectedParameter(FodyError):
+    pass
+
+
 class IMQFody(object):
     def __init__(self, url, username, password):
         object.__init__(self)
@@ -110,9 +114,41 @@ class IMQFody(object):
     def search_ip(self, ip):
         """
         Wrapper for search_cidr
+
         :param ip: ip as str
         :return: dict
         """
         return self.search_cidr(ip)
 
-    def search_fqdn(self, ):
+    def search_fqdn(self, fqdn):
+        """
+        Search in the contactdb for an fqdn.
+
+        :param fqdn: fqdn as str
+        :return: dict
+        """
+
+        result = self._search('contactdb', 'searchfqdn', {'domain': fqdn})
+        return self._get_contacts_from_id_list(result)
+
+    def search_national(self, cc):
+        """
+        Search through contactdb using a 2-3 letter country code
+
+        :param cc:
+        :return:
+        """
+
+        if len(cc) < 2 or len(cc) > 3:
+            raise UnexpectedParameter('Country code should be 2 or 3 letters long.')
+        result = self._search('contactdb', 'searchnational', {'countrycode', cc})
+        return self._get_contacts_from_id_list(result)
+
+    def get_event(self, id):
+        """
+        Retrieve event by id
+
+        :param id: event id int
+        :return: dict
+        """
+        return self._session.get('{}/api/event'.format(self._url), data={'id': id})
