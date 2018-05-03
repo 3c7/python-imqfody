@@ -157,7 +157,7 @@ class IMQFody(object):
         """
         response = self._session.get('{}/api/events'.format(self._url), data={'id': id})
         if response.status_code == 200:
-            return response.json()
+            return response.json()[0]
         raise HTTPError('Statuscode {} while getting event by id.'.format(response.status_code))
 
     def get_event_subqueries(self):
