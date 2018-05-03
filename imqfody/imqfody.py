@@ -137,8 +137,8 @@ class IMQFody(object):
         """
         Search through contactdb using a 2-3 letter country code
 
-        :param cc:
-        :return:
+        :param cc: 2 to 3 letter Country code
+        :return: dict
         """
 
         if len(cc) < 2 or len(cc) > 3:
@@ -157,8 +157,8 @@ class IMQFody(object):
         """
         response = self._session.get('{}/api/events'.format(self._url), data={'id': id})
         if response.status_code == 200:
-            return json.loads(response.text)
-        raise HTTPError('Statuscode: {}'.format(response.status_code))
+            return response.json()
+        raise HTTPError('Statuscode {} while getting event by id.'.format(response.status_code))
 
     def get_event_subqueries(self):
         """
@@ -177,3 +177,95 @@ class IMQFody(object):
         """
         return self._search('events', 'search', subquery)
 
+    def get_event_stats(self, subquery):
+        """
+        Returns distribution of events for a given subquery
+
+        :param subquery: dict subquery
+        :return: dict
+        """
+        return self._search('events', 'stats', subquery)
+
+    def export_events(self, subquery):
+        """
+        Exports events matching the subquery
+
+        :param subquery: dict subquery
+        :return: dict
+        """
+        return self._search('events', 'export', subquery)
+
+    # ##############
+    # Ticket queries
+    def get_ticket(self, id):
+        """
+        Get ticket by id
+
+        :param id: ticket id
+        :return: dict
+        """
+        response = self._session.get('{}/api/tickets'.format(self._url), data={'id': id})
+        if response.status_code == 200:
+            return response.json()
+        raise HTTPError('Statuscode {} while getting ticket by id.'.format(response.status_code))
+
+    def get_ticket_subqueries(self):
+        """
+        Returns a dict of subqueries.
+
+        :return: dict
+        """
+        return self._search('tickets', 'subqueries', {})
+
+    def search_ticket(self, subquery):
+        """
+        Search for tickets matching the subquery
+
+        :param subquery: dict subquery
+        :return: dict
+        """
+        return self._search('tickets', 'search', subquery)
+
+    def get_ticket_stats(self, subquery):
+        """
+        Get a statistic tickets matching the subquery.
+
+        :param subquery: dict subquery
+        :return: dict
+        """
+        return self._search('tickets', 'stats', subquery)
+
+    def get_ticket_recipient(self, ticket_number):
+        """
+        Get the recipient for a given ticket.
+
+        :param ticket_number: ticket number
+        :return: dict
+        """
+        return self._search('tickets', 'getRecipient', {'ticketnumber': ticket_number})
+
+    def get_ticket_event_ids(self, ticket_number):
+        """
+        Get eventIds for a ticket.
+
+        :param ticket_number: ticket number
+        :return: dict
+        """
+        return self._search('checkticket', 'getEventIDsForTicket', {'ticket': ticket_number})
+
+    def get_ticket_events(self, ticket_number, limit=0):
+        """
+        Get events for a ticket
+
+        :param ticket_number: ticket number
+        :param limit: limits the output to [limit] events, default 0
+        :return: dict
+        """
+        self._search('checkticket', 'getEventsForTicket', {'ticket': ticket_number, 'limit': limit})
+
+    def get_last_ticket_number(self):
+        """
+        Returns the last ticket number
+        :return: dict
+        """
+        return self._search('checkticket', 'getLastTicketNumber', {})
