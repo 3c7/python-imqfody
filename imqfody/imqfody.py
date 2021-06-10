@@ -20,16 +20,32 @@ class UnexpectedParameter(FodyError):
     pass
 
 
-class IMQFody(object):
+class IMQFody:
     def __init__(self, url, username, password, sslverify=True):
-        object.__init__(self)
         self._url = url.rstrip('/')
         self._session = requests.session()
-        self._session.auth = HTTPBasicAuth(username, password)
         self._session.verify = sslverify
+        self._credentials = username, password
+        self._login()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._session.close()
+
+    def _login(self):
+        """Implement new token based auth."""
+        response = self._session.post(
+            f"{self._url}/api/login", data={
+                "username": self._credentials[0],
+                "password": self._credentials[1]
+            }
+        )
+        if response.status_code != 200:
+            raise HTTPError(f"Fody returned invalid HTTP response: {response.status_code} - {response.text}")
+
+        response_data = response.json()
+        if "login_token" not in response_data:
+            raise KeyError(f"Fody API should have returned a login token, but hasn't.")
+        self._session.headers.update({"Authorization": response_data["login_token"]})
 
     def _search(self, handler, endpoint, query):
         """Generic search method to build queries.
@@ -41,7 +57,7 @@ class IMQFody(object):
             raise UnknownHandler('Handler must be one of [contactdb, events, tickets, checkticket].')
         response = self._session.get('{}/api/{}/{}'.format(self._url, handler, endpoint), data=query)
         if response.status_code != 200:
-            raise HTTPError(response.status_code)
+            raise HTTPError(f"Fody returned {response.status_code}: {response.text}")
         dict_response = json.loads(response.text)
         response.close()
         return dict_response
