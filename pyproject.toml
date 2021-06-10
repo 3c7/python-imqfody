@@ -4,6 +4,20 @@ version = "0.1.1"
 description = "Python wrapper for IntelMQ Fody API"
 authors = ["3c7 <3c7@posteo.de>"]
 license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/3c7/python-imqfody"
+repository = "https://github.com/3c7/python-imqfody"
+keywords = [
+    "intelmq",
+    "fody"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8"
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
