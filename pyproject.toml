@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "imqfody"
+version = "0.1.1"
+description = "Python wrapper for IntelMQ Fody API"
+authors = ["3c7 <3c7@posteo.de>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+requests = "^2.25.1"
+
+[tool.poetry.dev-dependencies]
+black = "^21.5b2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
